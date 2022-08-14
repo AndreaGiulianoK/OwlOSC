@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SharpOSC
+namespace OwlOSC
 {
 	public class Symbol
 	{
@@ -19,7 +19,7 @@ namespace SharpOSC
 			this.Value = value;
 		}
 
-		public string ToString()
+		public override string ToString()
 		{
 			return Value;
 		}

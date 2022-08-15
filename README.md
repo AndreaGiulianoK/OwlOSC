@@ -53,7 +53,7 @@ Compiled library and unity package here: **[Releases](https://github.com/AndreaG
 
 ## Changelog
 
-Changelog here [Changelog.md](https://github.com/AndreaGiulianoK/OwlOSC/blob/master/CHANGELOG.md)
+Changelog here **[Changelog.md](https://github.com/AndreaGiulianoK/OwlOSC/blob/master/CHANGELOG.md)**
 
 
 ## Using The Library

@@ -7,6 +7,9 @@ namespace OwlOsc.Test
 {
     class Program
     {
+        static int localPort = 1234;
+        static int remotePort = 1234;
+
         static void Main(string[] args)
         {
             Console.WriteLine("OwlOSC TEST");
@@ -16,12 +19,12 @@ namespace OwlOsc.Test
             //
             if(args[0] == "send"){
                 OscMessage message;
-                var sender = new UDPSender("127.0.0.1", 1234);
+                var sender = new UDPSender("127.0.0.1", remotePort);
                 message = new OscMessage("/test/1", 23, 42.01f, "hello world");
                 sender.Send(message);
             }
             if(args[0] == "receive"){
-                var listener = new UDPListener(1234);
+                var listener = new UDPListener(localPort);
                 OscMessage messageReceived = null;
                 while (messageReceived == null)
                 {
@@ -37,7 +40,7 @@ namespace OwlOsc.Test
             }
             if(args[0] == "receiveloop"){
                 
-                var listener = new UDPListener(1234, Callback);
+                var listener = new UDPListener(localPort, Callback);
 
                 Console.WriteLine("\nPress any key to stop and exit...");
                 Console.ReadKey();
@@ -46,7 +49,7 @@ namespace OwlOsc.Test
             //
             if(args[0] == "sendTicks"){
                 OscMessage message;
-                var sender = new UDPSender("127.0.0.1", 1234);
+                var sender = new UDPSender("127.0.0.1", remotePort);
                 for(int i = 0; i< 1000; i++){
                     double tick = System.DateTime.Now.Ticks;
                     message = new OscMessage("/test", tick);
@@ -57,7 +60,7 @@ namespace OwlOsc.Test
             }
             if(args[0] == "receiveTicks"){
                 
-                var listener = new UDPListener(1234, ReceiveTicks);
+                var listener = new UDPListener(localPort, ReceiveTicks);
 
                 Console.WriteLine("\nPress any key to stop and exit...");
                 Console.ReadKey();
@@ -99,7 +102,9 @@ namespace OwlOsc.Test
                 delta = (float)((tick - lastTick)/System.TimeSpan.TicksPerMillisecond);
                 lastTick = tick;
                 Console.WriteLine($"Message Received: '{messageReceived.Address}' -> {tick} @ Delta {delta}");
-            }catch{}
+            }catch (Exception e){
+                throw new Exception("Error on elavbborate ticks message: " + e.Message);
+            }
         }
 
     }

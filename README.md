@@ -51,19 +51,23 @@ Compiled library and unity package here: **[Releases](https://github.com/AndreaG
 
 (Note that nested arrays (arrays within arrays) are not supported, the OSC specification is unclear about whether that it is even allowed)
 
+## Changelog
+
+Changelog here (Changelog.md)[https://github.com/AndreaGiulianoK/OwlOSC/blob/master/CHANGELOG.md]
+
 
 ## Using The Library
 
 ### Unity3D:
 
 Import the package.
-OwlOSC is under that namespace "OWL.OSC".
+OwlOSC is under that namespace "OwlOSC".
 Look at the example scene in the folder "OwlOSC/Examples"
 
 ### .NET:
 
 Add a reference to OwlOSC.dll in your .NET project. 
-OwlOSC is under that namespace "OWL.OSC".
+OwlOSC is under that namespace "OwlOSC".
 
 ## Examples:
 
@@ -126,3 +130,11 @@ By giving UDPListener a callback you don't have to periodically check for incomi
 ## Contribute
 
 I would love to get some feedback. Use the Issue tracker on Github to send bug reports and feature requests, or just if you have something to say about the project. If you have code changes that you would like to have integrated into the main repository, send me a pull request or a patch. I will try my best to integrate them and make sure OwlOSC improves and matures.
+
+### TO DO:
+
+ - [ ] Upgrade UDP to Async Operation
+ - [ ] Add more practical handling and discrimination of messages and bundles
+ - [ ] Add message values Getter with nullcheck
+ - [ ] Unity Interface
+ - [ ] Unity Example

@@ -46,5 +46,15 @@ namespace OwlOSC
 
 			return len;
 		}
+
+
+		const string addressPattern = @"^\/$|^\/[a-zA-Z0-9\/]*[^\/]$";
+
+		public static bool ValideteAddress(string address){
+			if(string.IsNullOrEmpty(address))
+				return false;
+			System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(addressPattern);
+			return regex.IsMatch(address);
+		}
 	}
 }

@@ -483,5 +483,13 @@ namespace OwlOSC
 
 		#endregion
 
+
+		public override string ToString(){
+			if(IsBundle)
+				return ((OscBundle)this).ToString();
+			else
+				return ((OscMessage)this).ToString();
+		}
+
 	}
 }

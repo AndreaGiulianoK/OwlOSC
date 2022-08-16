@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2]  2022.08.17
+
+- Async address callback
+- Validate address util
+- Test program options change
+- Tested in Unity
+
 ## [1.1] 2022.08.16
 
  - Added test console program in `OwlOSC.Test` (send / receive, receive loop Async, speedtest, send / receive file)

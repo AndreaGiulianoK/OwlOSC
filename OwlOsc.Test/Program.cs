@@ -22,19 +22,20 @@ namespace OwlOsc.Test
         {
             Console.WriteLine("OwlOSC TEST");
             Console.WriteLine("USE: [OPTIONS] [filePath]");
-            Console.WriteLine("Options : [-send] [-receive] [-receiveloop] [-sendTicks] [-receiveTicks] [-sendFile] [-receiveFile]");
-            Console.WriteLine("Help: [help] -h --help /?");
+            Console.WriteLine("Options : [-test] [-send] [-receive] [-receiveloop] [-sendTicks] [-receiveTicks] [-sendFile] [-receiveFile]");
+            Console.WriteLine("Help: [help] [-h] [--help] [/?]");
 
             if(ShowHelpRequired(args)){
                 Console.WriteLine("HELP\n");
                 Console.WriteLine("Options");
-                Console.WriteLine("send             send debug message and bundle");
-                Console.WriteLine("receive          receive single message and bundle");
-                Console.WriteLine("receiveloop      receive loop async (don't close)");
-                Console.WriteLine("sendTicks        Speed test: send message with time ticks");
-                Console.WriteLine("receiveTicks     Speed test: receive ticks mesage and evaluate delay");
-                Console.WriteLine("sendFile         send single file, require [filePath] option");
-                Console.WriteLine("receiveFile      receive single file, require [filePath] option");
+                Console.WriteLine("-test             debug test");
+                Console.WriteLine("-send             send debug message and bundle");
+                Console.WriteLine("-receive          receive single message and bundle");
+                Console.WriteLine("-receiveloop      receive loop async (don't close)");
+                Console.WriteLine("-sendTicks        Speed test: send message with time ticks");
+                Console.WriteLine("-receiveTicks     Speed test: receive ticks mesage and evaluate delay");
+                Console.WriteLine("-sendFile         send single file, require [filePath] option");
+                Console.WriteLine("-receiveFile      receive single file, require [filePath] option");
                 Console.WriteLine("\nUSAGE:");
                 Console.WriteLine("     OwlOsc.Test -send");
                 Console.WriteLine("     OwlOsc.Test -receiveloop");
@@ -45,7 +46,62 @@ namespace OwlOsc.Test
             if(args.Length < 1 || args.Length > 2)
                 return;
             //
-            if(args[0] == "send"){
+            if(args[0] == "-test"){
+                Console.WriteLine("TEST");
+                //create new listner instance
+                var listener = new UDPListener(localPort);
+                //register for specific address
+                bool address = listener.AddAddress("/test", (packet) => {
+                    Console.WriteLine("Address: " + packet.ToString());
+                });
+                listener.AddAddress("/", (packet) => {
+                    Console.WriteLine("Address: " + packet.ToString());
+                });
+                 listener.AddAddress("//", (packet) => {
+                    Console.WriteLine("Address: " + packet.ToString());
+                });
+                 listener.AddAddress("/ /", (packet) => {
+                    Console.WriteLine("Address: " + packet.ToString());
+                });
+                listener.AddAddress("/test/", (packet) => {
+                    Console.WriteLine("Address: " + packet.ToString());
+                });
+                listener.AddAddress("/test /", (packet) => {
+                    Console.WriteLine("Address: " + packet.ToString());
+                });
+                listener.AddAddress("/test/a", (packet) => {
+                    Console.WriteLine("Address: " + packet.ToString());
+                });
+                listener.AddAddress("/test/ a", (packet) => {
+                    Console.WriteLine("Address: " + packet.ToString());
+                });
+                listener.AddAddress("/test/ a/", (packet) => {
+                    Console.WriteLine("Address: " + packet.ToString());
+                });
+                listener.AddAddress("", (packet) => {
+                    Console.WriteLine("Address: " + packet.ToString());
+                });
+                listener.AddAddress(null, (packet) => {
+                    Console.WriteLine("Address: " + packet.ToString());
+                });
+                //wait for 1 message from any address
+                Console.WriteLine("wait for 1 message");
+                OscPacket packet = null;
+                while(packet == null){
+                    packet = listener.Receive();
+                    //Task.Delay(1);
+                    System.Threading.Thread.Sleep(1);
+                }
+                Console.WriteLine("Packet:" + packet.ToString());
+                //start address loop
+                Console.WriteLine("start address loop");
+                listener.StartAddressEvaluationLoop();
+                Console.WriteLine("\nPress any key to stop and exit...");
+                Console.ReadKey();
+                listener.Close();
+            }
+
+            if(args[0] == "-send"){
                 OscMessage message;
                 var sender = new UDPSender("127.0.0.1", remotePort);
                 message = new OscMessage("/test/1", 23, 42.01f, "hello world");
@@ -56,7 +112,7 @@ namespace OwlOsc.Test
                 Console.WriteLine("Bundle Sent: " + bundle.ToString());
                 sender.Close();
             }
-            if(args[0] == "receive"){
+            if(args[0] == "-receive"){
                 var listener = new UDPListener(localPort);
                 OscPacket message=null;
                 while(message == null){
@@ -66,7 +122,7 @@ namespace OwlOsc.Test
                 listener.Close();
                 GetMessage(message);
             }
-            if(args[0] == "receiveloop"){
+            if(args[0] == "-receiveloop"){
                 
                 var listener = new UDPListener(localPort, GetMessage);
 
@@ -75,20 +131,19 @@ namespace OwlOsc.Test
                 listener.Close();
             }
             //
-            if(args[0] == "sendTicks"){
+            if(args[0] == "-sendTicks"){
                 OscMessage message;
                 var sender = new UDPSender("127.0.0.1", remotePort);
-                for(int i = 0; i< 10001; i++){
+                for(int i = 1; i <= 1001; i++){
                     double tick = System.DateTime.Now.Ticks;
-                    message = new OscMessage("/test", tick);
+                    message = new OscMessage("/ticks", tick, i);
                     sender.Send(message);
                     Console.WriteLine($"Sent: {tick}");
-                    //Task.Delay(1);
-                    //System.Threading.Thread.Sleep(1);
+                    System.Threading.Thread.Sleep(1);
                 }
                 sender.Close();
             }
-            if(args[0] == "receiveTicks"){
+            if(args[0] == "-receiveTicks"){
                 var listener = new UDPListener(localPort, ReceiveTicks);
                 Console.WriteLine("\nPress any key to stop and exit...");
                 Console.ReadKey();
@@ -96,7 +151,7 @@ namespace OwlOsc.Test
             }
 
             //
-            if(args[0] == "sendFile"){
+            if(args[0] == "-sendFile"){
                 Console.WriteLine("sendFile");
                 if(args.Length != 2)
                     throw new Exception("Invalid parameters");
@@ -115,7 +170,7 @@ namespace OwlOsc.Test
                     throw new Exception("No file found!");
                 }
             }
-            if(args[0] == "receiveFile"){
+            if(args[0] == "-receiveFile"){
                 Console.WriteLine("receiveFile");
                 if(args.Length != 2)
                     throw new Exception("Invalid parameters");
@@ -165,13 +220,14 @@ namespace OwlOsc.Test
             try{
                 var messageReceived = (OscMessage)packet;
                 double tick = (double)messageReceived.Arguments[0];
+                int i = (int)messageReceived.Arguments[1];
                 if(ticks == 0){
                     lastTick = tick;
                 }else{
                     delta = (tick - lastTick)/System.TimeSpan.TicksPerMillisecond;
                     lastTick = tick;
                     sum += delta;
-                    Console.WriteLine($"Message Received: {ticks} : '{messageReceived.Address}' -> {tick} @ Delta {delta}");
+                    Console.WriteLine($"Message Received: {ticks} / {i} : '{messageReceived.Address}' -> {tick} @ Delta {delta}");
                 }
                 ticks++;
             }catch (Exception e){

@@ -15,19 +15,18 @@ See [License.md](https://github.com/AndreaGiulianoK/OwlOSC/blob/master/LICENSE.m
 
 ## Download
 
-
 Compiled library and unity package here: **[Releases](https://github.com/AndreaGiulianoK/OwlOSC/releases)**
 
 
 ## Features
 
++ Multiplatform menaged dll (NetStandard 2.1)
 + Send / Receive OSC messages and bundle via UDP
 + OSC values converted from and to Net objects
 + Unity3D interface and utilities
 
 
 ## Supported Types
-
 
 [The following OSC types](http://opensoundcontrol.org/spec-1_0) are supported:
 
@@ -50,6 +49,18 @@ Compiled library and unity package here: **[Releases](https://github.com/AndreaG
 * ]	- Indicates the end of an array.
 
 (Note that nested arrays (arrays within arrays) are not supported, the OSC specification is unclear about whether that it is even allowed)
+
+## Performance and Testing
+
+Successful Testing and single message speed on send-receive on localhost
+
+- [+] Linux Ubuntu 20.04 (x64) -> 0.025 ms
+- [ ] Raspberry OS (ARM)
+- [+] Windows 10 (x64) -> ?? ms
+- [ ] macOS / OS X (x64)
+- [ ] Android
+- [ ] iOS
+
 
 ## Changelog
 
@@ -133,8 +144,9 @@ I would love to get some feedback. Use the Issue tracker on Github to send bug r
 
 ## TO DO:
 
- - [ ] Upgrade UDP to Async Operation
- - [ ] Add more practical handling and discrimination of messages and bundles
+ - [x] Upgrade UDP to Async Operation
+ - [x] Add more practical handling and discrimination of messages and bundles
+ - [ ] Add receiveng mesage address check and relative event handling
  - [ ] Add message values Getter with nullcheck
  - [ ] Unity Interface
- - [ ] Unity Example
+ - [ ] Unity Examples

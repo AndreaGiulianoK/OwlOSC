@@ -15,6 +15,8 @@ namespace OwlOSC
 				return parseMessage(OscData);
 		}
 
+		public bool IsBundle {get; protected set;}
+
 		public abstract byte[] GetBytes();
 
 		#region Parse OSC packages

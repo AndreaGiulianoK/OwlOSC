@@ -10,6 +10,9 @@ namespace OwlOSC
 {
 	public class UDPSender
 	{
+
+		private const int _MAX_PACKET_SIZE = 65507;
+
 		public int Port
 		{
 			get { return _port; }
@@ -40,12 +43,16 @@ namespace OwlOSC
 
 		public void Send(byte[] message)
 		{
+			if(message.Length > _MAX_PACKET_SIZE)
+				throw new Exception("Message exceeds UDP max packet size (64k)");
 			sock.SendTo(message, RemoteIpEndPoint);
 		}
 
 		public void Send(OscPacket packet)
 		{
 			byte[] data = packet.GetBytes();
+			if(data.Length > _MAX_PACKET_SIZE)
+				throw new Exception("Message exceeds UDP max packet size (64k)");
 			Send(data);
 		}
 

@@ -156,5 +156,9 @@ namespace OwlOSC
 
 			return output;
 		}
+
+		public override string ToString(){
+			return $"'{this.Address}' -> {string.Join(";",this.Arguments)}";
+		}
 	}
 }

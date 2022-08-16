@@ -25,6 +25,7 @@ namespace OwlOSC
 
 		public OscBundle(UInt64 timetag, params OscMessage[] args)
 		{
+			IsBundle = true;
 			_timetag = new Timetag(timetag);
 			Messages = new List<OscMessage>();
 			Messages.AddRange(args);
@@ -62,6 +63,16 @@ namespace OwlOSC
 			}
 
 			return output;
+		}
+
+		public override string ToString(){
+			string messages = "";
+			int i = 0;
+			this.Messages.ForEach(m=> {
+				i++;
+				messages += $"\n({i}) {m.ToString()}";
+			});
+			return $"# {this.Timestamp.ToString("o")} : {messages}";
 		}
 
 	}

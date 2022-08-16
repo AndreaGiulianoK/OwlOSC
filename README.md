@@ -148,5 +148,6 @@ I would love to get some feedback. Use the Issue tracker on Github to send bug r
  - [x] Add more practical handling and discrimination of messages and bundles
  - [ ] Add receiveng mesage address check and relative event handling
  - [ ] Add message values Getter with nullcheck
+ - [x] Release Dll
  - [ ] Unity Interface
  - [ ] Unity Examples

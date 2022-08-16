@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using OwlOSC;
 using System.Threading.Tasks;
 using System.Linq;
@@ -11,10 +13,35 @@ namespace OwlOsc.Test
         static int localPort = 1234;
         static int remotePort = 1234;
 
+        static bool ShowHelpRequired(IEnumerable<string> args){
+            return args.Select(s => s.ToLowerInvariant())
+                .Intersect(new[] {"help", "/?", "--help", "-h"}).Any();
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine("OwlOSC TEST");
-            Console.WriteLine("Params: [send][receive][receiveloop][sendTicks][receiveTicks][sendFile][receiveFile] || [filePath]");
+            Console.WriteLine("USE: [OPTIONS] [filePath]");
+            Console.WriteLine("Options : [-send] [-receive] [-receiveloop] [-sendTicks] [-receiveTicks] [-sendFile] [-receiveFile]");
+            Console.WriteLine("Help: [help] -h --help /?");
+
+            if(ShowHelpRequired(args)){
+                Console.WriteLine("HELP\n");
+                Console.WriteLine("Options");
+                Console.WriteLine("send             send debug message and bundle");
+                Console.WriteLine("receive          receive single message and bundle");
+                Console.WriteLine("receiveloop      receive loop async (don't close)");
+                Console.WriteLine("sendTicks        Speed test: send message with time ticks");
+                Console.WriteLine("receiveTicks     Speed test: receive ticks mesage and evaluate delay");
+                Console.WriteLine("sendFile         send single file, require [filePath] option");
+                Console.WriteLine("receiveFile      receive single file, require [filePath] option");
+                Console.WriteLine("\nUSAGE:");
+                Console.WriteLine("     OwlOsc.Test -send");
+                Console.WriteLine("     OwlOsc.Test -receiveloop");
+                Console.WriteLine("     OwlOsc.Test -sendFile path2file2read");
+                Console.WriteLine("     OwlOsc.Test -receiveFile path2file2write");
+            }
+
             if(args.Length < 1 || args.Length > 2)
                 return;
             //

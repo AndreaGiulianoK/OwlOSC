@@ -54,9 +54,11 @@ Compiled library and unity package here: **[Releases](https://github.com/AndreaG
 
 Successful Testing and single message speed on send-receive on localhost
 
-- [+] Linux Ubuntu 20.04 (x64) -> 0.025 ms
+Speed: ~ 0.025ms (linux) / ~0.05ms (win)
+
+- [+] Linux Ubuntu 20.04 (x64)
 - [ ] Raspberry OS (ARM)
-- [+] Windows 10 (x64) -> ?? ms
+- [+] Windows 10 (x64)
 - [ ] macOS / OS X (x64)
 - [ ] Android
 - [ ] iOS

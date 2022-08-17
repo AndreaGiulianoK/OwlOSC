@@ -21,10 +21,11 @@ Compiled library and unity package here: **[Releases](https://github.com/AndreaG
 ## Features
 
 + Multiplatform menaged dll (NetStandard 2.1)
-+ Send / Receive OSC messages and bundle via UDP
++ Send / Receive OSC messages and bundle via UDP in Async Multithread
 + Register address callback
 + OSC values converted from and to Net objects
 + Unity3D interface and utilities
++ **Unity3D multithread safe read option (needed to create unity gameobject in main render thread)**
 
 
 ## Supported Types
@@ -195,9 +196,10 @@ By registering a callback to UDPListener the listener will invoke the callback w
 			listener.AddAddress("/test",(packet) => {
 				Debug.Log(packet.ToString());
 			});
+			//Start Threaded message reader
 			listener.StartAddressEvaluationLoop();
 
-			//Optionally you can read directly in a coroutine
+			//If You want to create  UNITY OBJECT in main thread you can read directly in a coroutine
 			StartCoroutine(ReadLoop());
 		}
 
@@ -217,6 +219,9 @@ By registering a callback to UDPListener the listener will invoke the callback w
 			}
 		}
 	}
+
+In unity it is possible to create new Unity GameObjects only from the main thread. Since UDPListner is multithreaded if you receive the callback directly it is not possible to instantiate new objects.
+it is therefore necessary to read manually from a coroutine (which acts on the main thread). In this way it is possible to receive all messages and perform "heavy" actions in the Unity Render thread without affecting the speed of reading messages.
 
 
 ## Contribute

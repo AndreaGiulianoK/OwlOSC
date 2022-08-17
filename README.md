@@ -206,7 +206,7 @@ By registering a callback to UDPListener the listener will invoke the callback w
 			while(true){
 				var packet = listener.Receive();
 				if(packet != null)
-				Debug.Log(packet.ToString());
+					Debug.Log(packet.ToString());
 				yield return new WaitForEndOfFrame();
 			}
 		}

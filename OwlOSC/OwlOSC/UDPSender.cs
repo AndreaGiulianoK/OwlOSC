@@ -8,8 +8,12 @@ using System.Threading;
 
 namespace OwlOSC
 {
-	public class UDPSender
+	public class UDPSender : IDisposable
 	{
+
+		~UDPSender(){
+			Dispose();
+		}
 
 		private const int _MAX_PACKET_SIZE = 65507;
 
@@ -41,6 +45,15 @@ namespace OwlOSC
 			RemoteIpEndPoint = new IPEndPoint(addresses[0], port);
 		}
 
+		public UDPSender (IPAddress address, int port){
+			_port = port;
+			_address = address.ToString();
+
+			sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+			RemoteIpEndPoint = new IPEndPoint(address, port);
+		}
+
 		public void Send(byte[] message)
 		{
 			if(message.Length > _MAX_PACKET_SIZE)
@@ -56,8 +69,7 @@ namespace OwlOSC
 			Send(data);
 		}
 
-		public void Close()
-		{
+		public void Dispose(){
 			sock.Close();
 		}
 	}

@@ -2,7 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.2]  2022.08.17
+## [1.3] 2022.08.17
+ - IDisposable for sender/listener
+
+## [1.2] 2022.08.17
 
 - Async address callback
 - Validate address util

@@ -14,6 +14,10 @@ namespace OwlOSC
     public class UDPListener : IDisposable
     {
 
+        ~UDPListener(){
+            Dispose();
+        }
+
 		private const int _MAX_QUEUE_SIZE = 1000;
 
         public int Port { get; private set; }
@@ -201,16 +205,11 @@ namespace OwlOSC
 
         bool closing = false;
 
-        public void Close()
+        public void Dispose()
         {
             closing = true;
             cancelTokenSource.Cancel();
             receivingUdpClient.Close();
-        }
-
-        public void Dispose()
-        {
-            this.Close();
             receivingUdpClient.Dispose();
         }
 

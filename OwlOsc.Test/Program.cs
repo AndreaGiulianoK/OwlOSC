@@ -98,28 +98,28 @@ namespace OwlOsc.Test
                 listener.StartAddressEvaluationLoop();
                 Console.WriteLine("\nPress any key to stop and exit...");
                 Console.ReadKey();
-                listener.Close();
+                listener.Dispose();
             }
 
             if(args[0] == "-send"){
-                var sender = new UDPSender("127.0.0.1", remotePort);
-                OscMessage message = new OscMessage("/test/1", 23, 42.01f, "hello world");
-                sender.Send(message);
-                Console.WriteLine($"Mesage Sent: " + message.ToString());
-                var bundle = new OscBundle(new Timetag(DateTime.UtcNow).Tag, new OscMessage("/test",1.34f),new OscMessage("/test/subtest",2.3434d), new OscMessage("/c",3));
-                sender.Send(bundle);
-                Console.WriteLine("Bundle Sent: " + bundle.ToString());
-                sender.Close();
+                using( var sender = new UDPSender("127.0.0.1", remotePort)){
+                    OscMessage message = new OscMessage("/test/1", 23, 42.01f, "hello world");
+                    sender.Send(message);
+                    Console.WriteLine($"Mesage Sent: " + message.ToString());
+                    var bundle = new OscBundle(new Timetag(DateTime.UtcNow).Tag, new OscMessage("/test",1.34f),new OscMessage("/test/subtest",2.3434d), new OscMessage("/c",3));
+                    sender.Send(bundle);
+                    Console.WriteLine("Bundle Sent: " + bundle.ToString());
+                }
             }
             if(args[0] == "-receive"){
-                var listener = new UDPListener(localPort);
-                OscPacket message=null;
-                while(message == null){
-                    message = listener.Receive();
-                    System.Threading.Thread.Sleep(1);
-                }
-                listener.Close();
-                GetMessage(message);
+                using(var listener = new UDPListener(localPort)){
+                    OscPacket message=null;
+                    while(message == null){
+                        message = listener.Receive();
+                        System.Threading.Thread.Sleep(1);
+                    }
+                    GetMessage(message);
+                }   
             }
             if(args[0] == "-receiveloop"){
                 
@@ -127,26 +127,26 @@ namespace OwlOsc.Test
 
                 Console.WriteLine("\nPress any key to stop and exit...");
                 Console.ReadKey();
-                listener.Close();
+                listener.Dispose();
             }
             //
             if(args[0] == "-sendTicks"){
                 OscMessage message;
-                var sender = new UDPSender("127.0.0.1", remotePort);
-                for(int i = 1; i <= 1001; i++){
-                    double tick = System.DateTime.Now.Ticks;
-                    message = new OscMessage("/ticks", tick, i);
-                    sender.Send(message);
-                    Console.WriteLine($"Sent: {tick}");
-                    System.Threading.Thread.Sleep(1);
+                using(var sender = new UDPSender("127.0.0.1", remotePort)){
+                    for(int i = 1; i <= 1001; i++){
+                        double tick = System.DateTime.Now.Ticks;
+                        message = new OscMessage("/ticks", tick, i);
+                        sender.Send(message);
+                        Console.WriteLine($"Sent: {tick}");
+                        System.Threading.Thread.Sleep(1);
+                    }
                 }
-                sender.Close();
             }
             if(args[0] == "-receiveTicks"){
                 var listener = new UDPListener(localPort, ReceiveTicks);
                 Console.WriteLine("\nPress any key to stop and exit...");
                 Console.ReadKey();
-                listener.Close();
+                listener.Dispose();
             }
 
             //
@@ -156,15 +156,15 @@ namespace OwlOsc.Test
                     throw new Exception("Invalid parameters");
                 if(File.Exists(args[1])){
                     var data = File.ReadAllBytes(args[1]);
-                    var message = new OscMessage("/file", data);
-                    var sender = new UDPSender("127.0.0.1",remotePort);
-                    try{
-                        sender.Send(message);
-                        Console.WriteLine($"File {args[1]} Sent");
-                    }catch (Exception e){
-                        Console.WriteLine("Error Sending file: " + e.Message);
+                    using(var sender = new UDPSender("127.0.0.1",remotePort)){
+                        var message = new OscMessage("/file", data);
+                        try{
+                            sender.Send(message);
+                            Console.WriteLine($"File {args[1]} Sent");
+                        }catch (Exception e){
+                            Console.WriteLine("Error Sending file: " + e.Message);
+                        }
                     }
-                    sender.Close();
                 }else{
                     throw new Exception("No file found!");
                 }
@@ -173,13 +173,13 @@ namespace OwlOsc.Test
                 Console.WriteLine("receiveFile");
                 if(args.Length != 2)
                     throw new Exception("Invalid parameters");
-                var listner = new UDPListener(localPort);
                 OscPacket message=null;
-                while(message == null){
-                    message = listner.Receive();
-                    Task.Delay(1);
+                using( var listner = new UDPListener(localPort) ){
+                    while(message == null){
+                        message = listner.Receive();
+                        Task.Delay(1);
+                    }
                 }
-                listner.Close();
                 if(message != null){
                     byte[] data = (byte[])((OscMessage)message).Arguments[0];
                     if(data != null && data.Length > 0){

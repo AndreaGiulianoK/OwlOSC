@@ -97,10 +97,12 @@ OwlOSC is under that namespace "OwlOSC".
 	{
 		static void Main(string[] args)
 		{
-			var sender = new OwlOSC.UDPSender("127.0.0.1", 55555);
-			OwlOSC.OscMessage message = new OwlOSC.OscMessage("/test/1", 23, 42.01f, "hello world");
-			sender.Send(message);
-			sender.Close();
+			using(var sender = new OwlOSC.UDPSender("127.0.0.1", 55555))
+			{
+				OwlOSC.OscMessage message = new OwlOSC.OscMessage("/test/1", 23, 42.01f, "hello world");
+				sender.Send(message);
+			}
+
 		}
 	}
 
@@ -112,14 +114,16 @@ This example sends an OSC message to the local machine on port 55555 containing 
 	{
 		static void Main(string[] args)
 		{
-			var listener = new OwlOSC.UDPListener(55555);
-			OwlOSC.OscPacket messageReceived=null;
-			while(messageReceived == null){
-				messageReceived = listener.Receive();
-				System.Threading.Thread.Sleep(1);
+			using(var listener = new OwlOSC.UDPListener(55555))
+			{
+				OwlOSC.OscPacket messageReceived=null;
+				while(messageReceived == null)
+				{
+					messageReceived = listener.Receive();
+					System.Threading.Thread.Sleep(1);
+				}
+				Console.WriteLine(messageReceived.ToString());
 			}
-			listener.Close();
-			Console.WriteLine(messageReceived.ToString());
 		}
 	}
 
@@ -139,7 +143,7 @@ When messageReceived is pointig to a message the cycle ends, the listner is clos
 			//keeps the program open until a key is pressed
 			Console.WriteLine("\nPress any key to stop and exit...");
 			Console.ReadKey();
-			listener.Close();
+			listener.Dispose();
 		}
 	}
 
@@ -156,13 +160,14 @@ By giving UDPListener a callback you don't have to periodically check for incomi
 			bool address = listener.AddAddress("/test", (packet) => {
 				Console.WriteLine("Address: " + packet.ToString());
 			});
+			
 			//Start address evaluation loop
 			listener.StartAddressEvaluationLoop();
 
 			//keeps the program open until a key is pressed
 			Console.WriteLine("\nPress any key to stop and exit...");
 			Console.ReadKey();
-			listener.Close();
+			listener.Dispose();
 		}
 	}
 
@@ -179,7 +184,7 @@ By registering a callback to UDPListener the listener will invoke the callback w
 		UDPSender sender;
 		UDPListener listener;
 
-		private void Start() {
+		private void OnEnable() {
 
 			//Instantiate Sender and send a message
 			sender = new UDPSender("127.0.0.1",55555);
@@ -196,10 +201,11 @@ By registering a callback to UDPListener the listener will invoke the callback w
 			StartCoroutine(ReadLoop());
 		}
 
-		private void OnDestroy() {
+		//Free Resources
+		private void OnDisable() {
 			StopAllCoroutines();
-			sender.Close();
-			listener.Close();
+			sender.Dispose();
+			listener.Dispose();
 		}
 
 		IEnumerator ReadLoop(){

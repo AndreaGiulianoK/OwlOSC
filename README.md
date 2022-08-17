@@ -22,6 +22,7 @@ Compiled library and unity package here: **[Releases](https://github.com/AndreaG
 
 + Multiplatform menaged dll (NetStandard 2.1)
 + Send / Receive OSC messages and bundle via UDP
++ Register address callback
 + OSC values converted from and to Net objects
 + Unity3D interface and utilities
 
@@ -52,9 +53,15 @@ Compiled library and unity package here: **[Releases](https://github.com/AndreaG
 
 ## Performance and Testing
 
-Successful Testing and single message speed on send-receive on localhost
+### Speed:
+
+Single message speed on send-receive on localhost
 
 Speed: ~ 0.025ms (linux) / ~0.05ms (win)
+
+*Note: for reliability insert a delay of 1ms between two consecutive message otherwise udp packet can be dropped.*
+
+### Successful Testing:
 
 - [+] Linux Ubuntu 20.04 (x64)
 - [ ] Raspberry OS (ARM)
@@ -84,61 +91,122 @@ OwlOSC is under that namespace "OwlOSC".
 
 ## Examples:
 
-### .NET: Sending a message
+### .NET: Sending a message Synchronously
 
 	class Program
 	{
 		static void Main(string[] args)
 		{
-			var message = new OwlOSC.OscMessage("/test/1", 23, 42.01f, "hello world");
 			var sender = new OwlOSC.UDPSender("127.0.0.1", 55555);
+			OwlOSC.OscMessage message = new OwlOSC.OscMessage("/test/1", 23, 42.01f, "hello world");
 			sender.Send(message);
+			sender.Close();
 		}
 	}
 
 This example sends an OSC message to the local machine on port 55555 containing 3 arguments: an integer with a value of 23, a floating point number with the value 42.01 and the string "hello world". If another program is listening to port 55555 it will receive the message and be able to use the data sent.
 
-### .NET: Receiving a Message (Synchronous)
+### .NET: Receiving a Message Asynchronous Manually
 
 	class Program
 	{
 		static void Main(string[] args)
 		{
-			var listener = new UDPListener(55555);
-			OscMessage messageReceived = null;
-			while (messageReceived == null)
-			{
-				messageReceived = (OscMessage)listener.Receive();
-				Thread.Sleep(1);
+			var listener = new OwlOSC.UDPListener(55555);
+			OwlOSC.OscPacket messageReceived=null;
+			while(messageReceived == null){
+				messageReceived = listener.Receive();
+				System.Threading.Thread.Sleep(1);
 			}
-			Console.WriteLine("Received a message!");
+			listener.Close();
+			Console.WriteLine(messageReceived.ToString());
 		}
 	}
 
 This shows a very simple way of waiting for incoming messages. The listener.Receive() method will check if the listener has received any new messages since it was last called. It will poll for a message every millisecond. If there is a new message that has not been returned it will assign messageReceived to point to that message. If no message has been received since the last call to Receive it will return null.
+When messageReceived is pointig to a message the cycle ends, the listner is closed and the content of the message is returned to the console.
 
-### .NET:  Receiving a Message (Asynchronous)
+### .NET:  Receiving a Message Asynchronous by direct callback
 
 	class Program
 	{
 		public void Main(string[] args)
 		{
-			// The cabllback function
-			HandleOscPacket callback = delegate(OscPacket packet)
-			{
-				var messageReceived = (OscMessage)packet;
-				Console.WriteLine("Received a message!");
-			};
+			var listener = new OwlOSC.UDPListener(localPort, (packet) => {
+				Console.WriteLine(packet.ToString());
+			});
 
-			var listener = new UDPListener(55555, callback);
-
-			Console.WriteLine("Press enter to stop");
-			Console.ReadLine();
+			//keeps the program open until a key is pressed
+			Console.WriteLine("\nPress any key to stop and exit...");
+			Console.ReadKey();
 			listener.Close();
 		}
 	}
 
-By giving UDPListener a callback you don't have to periodically check for incoming messages. The listener will simply invoke the callback whenever a message is received. You are free to implement any code you need inside the callback.
+By giving UDPListener a callback you don't have to periodically check for incoming messages. The listener will simply invoke the callback whenever a message is received. No address check is performed.
+
+### .NET:  Receiving a Message Asynchronous by Address callback handling
+
+	class Program
+	{
+		public void Main(string[] args)
+		{
+			var listener = new OwlOSC.UDPListener(localPort);
+			//register a callback for specific address, only messages with the corresponding address will invoke the callback
+			bool address = listener.AddAddress("/test", (packet) => {
+				Console.WriteLine("Address: " + packet.ToString());
+			});
+
+			//keeps the program open until a key is pressed
+			Console.WriteLine("\nPress any key to stop and exit...");
+			Console.ReadKey();
+			listener.Close();
+		}
+	}
+
+By registering a callback to UDPListener the listener will invoke the callback whenever a message with the matching address is received.
+
+### UNITY:  Example Send/Receive script
+
+	using System.Collections;
+	using UnityEngine;
+	using OwlOSC;
+
+	public class OwlOscTest : MonoBehaviour
+	{
+		UDPSender sender;
+		UDPListener listener;
+
+		private void Start() {
+			//Instantiate Sender and send a message
+			sender = new UDPSender("127.0.0.1",55555);
+			sender.Send(new OscMessage("/test", 42, "hello"));
+			//Instantiate Listener and register address
+			listener = new UDPListener(55555);
+			listener.AddAddress("/test",(packet) => {
+				Debug.Log(packet.ToString());
+			});
+			listener.StartAddressEvaluationLoop();
+			//Optionally you read directly in a coroutine
+			StartCoroutine(ReadLoop());
+		}
+
+		private void OnDestroy() {
+			StopAllCoroutines();
+			sender.Close();
+			listener.Close();
+		}
+
+		IEnumerator ReadLoop(){
+			while(true){
+				var packet = listener.Receive();
+				if(packet != null)
+				Debug.Log(packet.ToString());
+				yield return new WaitForEndOfFrame();
+			}
+		}
+	}
+
 
 ## Contribute
 
@@ -148,8 +216,9 @@ I would love to get some feedback. Use the Issue tracker on Github to send bug r
 
  - [x] Upgrade UDP to Async Operation
  - [x] Add more practical handling and discrimination of messages and bundles
- - [ ] Add receiveng mesage address check and relative event handling
+ - [x] Add receiveng message address check and relative event handling
  - [ ] Add message values Getter with nullcheck
  - [x] Release Dll
+ - [x] Unity Test
  - [ ] Unity Interface
  - [ ] Unity Examples

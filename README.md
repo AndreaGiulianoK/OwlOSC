@@ -63,9 +63,9 @@ Speed: ~ 0.025ms (linux) / ~0.05ms (win)
 
 ### Successful Testing:
 
-- [+] Linux Ubuntu 20.04 (x64)
+- [x] Linux Ubuntu 20.04 (x64)
 - [ ] Raspberry OS (ARM)
-- [+] Windows 10 (x64)
+- [x] Windows 10 (x64)
 - [ ] macOS / OS X (x64)
 - [ ] Android
 - [ ] iOS

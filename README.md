@@ -156,6 +156,8 @@ By giving UDPListener a callback you don't have to periodically check for incomi
 			bool address = listener.AddAddress("/test", (packet) => {
 				Console.WriteLine("Address: " + packet.ToString());
 			});
+			//Start address evaluation loop
+			listener.StartAddressEvaluationLoop();
 
 			//keeps the program open until a key is pressed
 			Console.WriteLine("\nPress any key to stop and exit...");
@@ -178,16 +180,19 @@ By registering a callback to UDPListener the listener will invoke the callback w
 		UDPListener listener;
 
 		private void Start() {
+
 			//Instantiate Sender and send a message
 			sender = new UDPSender("127.0.0.1",55555);
 			sender.Send(new OscMessage("/test", 42, "hello"));
+
 			//Instantiate Listener and register address
 			listener = new UDPListener(55555);
 			listener.AddAddress("/test",(packet) => {
 				Debug.Log(packet.ToString());
 			});
 			listener.StartAddressEvaluationLoop();
-			//Optionally you read directly in a coroutine
+
+			//Optionally you can read directly in a coroutine
 			StartCoroutine(ReadLoop());
 		}
 

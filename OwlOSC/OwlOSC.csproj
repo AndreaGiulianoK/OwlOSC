@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.1;netcoreapp3.1</TargetFrameworks>
     <AssemblyName>OwlOSC</AssemblyName>
-    <Version>1.3</Version>
+    <Version>1.4</Version>
     <Company>OwlInteractive</Company>
     <Authors>AndreaGiuliano</Authors>
     <Product>OwlOSC</Product>

@@ -179,10 +179,20 @@ namespace OwlOSC
         {
 			if(!packet.IsBundle){
 				var address = ((OscMessage)packet).Address;
-				addressCallbacks.Where(x=>x.address == address).ToList().ForEach(x=>x.callback.Invoke(packet));
+                if(Utils.ValideteAddress(address)){
+				    addressCallbacks.Where(x => x.address == address).ToList().ForEach(x => x.callback.Invoke(packet));
+                }else{
+                    Console.WriteLine("Received message address malformed");
+                }
 			}else{
 				var bundle = (OscBundle)packet;
-				bundle.Messages.ForEach(m=>addressCallbacks.Where(x=>x.address == m.Address).ToList().ForEach(x=>x.callback.Invoke(m)));
+				bundle.Messages.ForEach(m => {
+                    if(Utils.ValideteAddress(m.Address)){
+                        addressCallbacks.Where(x => x.address == m.Address).ToList().ForEach(x => x.callback.Invoke(m));
+                    }else{
+                        Console.WriteLine("Received message address malformed");
+                    }
+                });
 			}
         }
 

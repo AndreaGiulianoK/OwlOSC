@@ -48,7 +48,7 @@ namespace OwlOSC
 		}
 
 
-		const string addressPattern = @"^\/$|^\/[a-zA-Z0-9\/]*[^\/]$";
+		const string addressPattern = @"^\/$|^\/([a-zA-Z0-9\/\*\[\]-]*)([a-zA-Z0-9\*\]])$";
 
 		public static bool ValideteAddress(string address){
 			if(string.IsNullOrEmpty(address))

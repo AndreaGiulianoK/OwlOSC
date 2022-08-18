@@ -51,48 +51,9 @@ namespace OwlOsc.Test
                 //create new listner instance
                 var listener = new UDPListener(localPort);
                 //register for specific address
-                bool address = listener.AddAddress("/test", (packet) => {
+                bool address = listener.AddAddress("/test/*", (packet) => {
                     Console.WriteLine("Address: " + packet.ToString());
                 });
-                listener.AddAddress("/", (packet) => {
-                    Console.WriteLine("Address: " + packet.ToString());
-                });
-                 listener.AddAddress("//", (packet) => {
-                    Console.WriteLine("Address: " + packet.ToString());
-                });
-                 listener.AddAddress("/ /", (packet) => {
-                    Console.WriteLine("Address: " + packet.ToString());
-                });
-                listener.AddAddress("/test/", (packet) => {
-                    Console.WriteLine("Address: " + packet.ToString());
-                });
-                listener.AddAddress("/test /", (packet) => {
-                    Console.WriteLine("Address: " + packet.ToString());
-                });
-                listener.AddAddress("/test/a", (packet) => {
-                    Console.WriteLine("Address: " + packet.ToString());
-                });
-                listener.AddAddress("/test/ a", (packet) => {
-                    Console.WriteLine("Address: " + packet.ToString());
-                });
-                listener.AddAddress("/test/ a/", (packet) => {
-                    Console.WriteLine("Address: " + packet.ToString());
-                });
-                listener.AddAddress("", (packet) => {
-                    Console.WriteLine("Address: " + packet.ToString());
-                });
-                listener.AddAddress(null, (packet) => {
-                    Console.WriteLine("Address: " + packet.ToString());
-                });
-                //wait for 1 message from any address
-                Console.WriteLine("wait for 1 message");
-                OscPacket packet = null;
-                while(packet == null){
-                    packet = listener.Receive();
-                    //Task.Delay(1);
-                    System.Threading.Thread.Sleep(1);
-                }
-                Console.WriteLine("Packet:" + packet.ToString());
                 //start address loop
                 Console.WriteLine("start address loop");
                 listener.StartAddressEvaluationLoop();

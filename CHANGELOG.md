@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [1.4] 2022.08.18
 - Received message address validation
+- Bundle constructor
 
 ## [1.3] 2022.08.17
  - IDisposable for sender/listener

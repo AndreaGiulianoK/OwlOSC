@@ -23,6 +23,12 @@ namespace OwlOSC
 
 		public List<OscMessage> Messages;
 
+		public OscBundle(){
+			IsBundle = true;
+			_timetag = new Timetag(DateTime.UtcNow);
+			Messages = new List<OscMessage>();
+		}
+
 		public OscBundle(UInt64 timetag, params OscMessage[] args)
 		{
 			IsBundle = true;

@@ -237,15 +237,16 @@ namespace OwlOSC
 		/// <summary>
 		/// Get single message from queue.
 		/// WARNING! Removes it from address evaluation loop.
+        /// WARNING! Can be NULL, require a nullcheck.
 		/// </summary>
-		/// <returns>message/bundle packet, can be NULL if malformed</returns>
+		/// <returns>message/bundle packet, can be NULL</returns>
         public OscPacket Receive()
         {
             if (closing) throw new Exception("UDPListener has been closed.");
 
             if (packetQueue.Count() > 0)
             {
-                OscPacket packet;
+                OscPacket packet = null;
                 packetQueue.TryDequeue(out packet);
                 return packet;
             }

@@ -196,10 +196,8 @@ By registering a callback to UDPListener the listener will invoke the callback w
 			listener.AddAddress("/test",(packet) => {
 				Debug.Log(packet.ToString());
 			});
-			//Start Threaded message reader
-			listener.StartAddressEvaluationLoop();
 
-			//If You want to create  UNITY OBJECT in main thread you can read directly in a coroutine
+			//If You want to create UNITY OBJECT in main thread you can read from a message pool from a coroutine
 			StartCoroutine(ReadLoop());
 		}
 
@@ -212,6 +210,8 @@ By registering a callback to UDPListener the listener will invoke the callback w
 
 		IEnumerator ReadLoop(){
 			while(true){
+				// Receive method dequeue the massage
+				// Require null check!
 				var packet = listener.Receive();
 				if(packet != null)
 					Debug.Log(packet.ToString());

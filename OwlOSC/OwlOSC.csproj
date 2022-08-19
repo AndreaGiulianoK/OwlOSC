@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netcoreapp3.1</TargetFrameworks>
     <AssemblyName>OwlOSC</AssemblyName>
-    <Version>1.4</Version>
+    <Version>1.5</Version>
     <Company>OwlInteractive</Company>
     <Authors>AndreaGiuliano</Authors>
     <Product>OwlOSC</Product>

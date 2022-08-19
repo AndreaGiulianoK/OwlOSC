@@ -1,0 +1,13 @@
+SPEED:
+
+Windows:
+
+direct callback : 0.07 ms
+address no delay no wildcard : 0.08 ms
+address no delay regex wildcard : 0.09 ms 
+address no delay regex wildcard match : 0.08 ms
+
+
+address delay no wildcard : 15 ms
+address delay regex : 15 ms
+address immediate regex : 0.08 ms

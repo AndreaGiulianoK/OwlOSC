@@ -13,6 +13,9 @@ namespace OwlOsc.Test
         static int localPort = 1234;
         static int remotePort = 1234;
 
+        static int mm = 0;
+        static DateTime start;
+
         static bool ShowHelpRequired(IEnumerable<string> args){
             return args.Select(s => s.ToLowerInvariant())
                 .Intersect(new[] {"help", "/?", "--help", "-h"}).Any();
@@ -51,12 +54,37 @@ namespace OwlOsc.Test
                 //create new listner instance
                 var listener = new UDPListener(localPort);
                 //register for specific address
-                bool address = listener.AddAddress("/test/*", (packet) => {
-                    Console.WriteLine("Address: " + packet.ToString());
+                
+                listener.AddAddress("/test/*", (packet) => {
+                    //Console.WriteLine("/test/* : " + packet.ToString());
                 });
-                //start address loop
-                Console.WriteLine("start address loop");
-                listener.StartAddressEvaluationLoop();
+                
+                listener.AddAddress("/ds/*/ds", (packet) => {
+                   // Console.WriteLine("/ds/*/ds : " + packet.ToString());
+                });
+
+                listener.AddAddress("/er", (packet) => {
+                    //Console.WriteLine("/er : " + packet.ToString());
+                });
+
+                listener.AddAddress("/ds/*", (packet) => {
+                    //Console.WriteLine("/ds/* : " + packet.ToString());
+                });
+
+                bool ticks = listener.AddAddress("/ticks", (message) => {
+                    mm++;
+                    if(mm == 1){
+                        start = DateTime.UtcNow;
+                        Console.WriteLine("start: " + start.ToString("o"));
+                    }
+                    if(mm == 1000){
+                        var end = DateTime.UtcNow - start;
+                        Console.WriteLine("end: " + DateTime.UtcNow.ToString("o"));
+                        Console.WriteLine("Elapsed: " + end.TotalMilliseconds);
+                        Console.WriteLine("Speed m/sec: " + (end.TotalMilliseconds/1000).ToString());
+                    }
+                });
+
                 Console.WriteLine("\nPress any key to stop and exit...");
                 Console.ReadKey();
                 listener.Dispose();
@@ -99,7 +127,7 @@ namespace OwlOsc.Test
                         message = new OscMessage("/ticks", tick, i);
                         sender.Send(message);
                         Console.WriteLine($"Sent: {tick}");
-                        System.Threading.Thread.Sleep(1);
+                        //System.Threading.Thread.Sleep(1);
                     }
                 }
             }
@@ -152,6 +180,20 @@ namespace OwlOsc.Test
                 }else{
                     throw new Exception("Malformed OSC message");
                 }
+            }
+        }
+
+        static void Test(OscPacket packet){
+            mm++;
+            if(mm == 1){
+                start = DateTime.UtcNow;
+                Console.WriteLine("start: " + start.ToString("o"));
+            }
+            if(mm == 500){
+                var end = DateTime.UtcNow - start;
+                Console.WriteLine("end: " + DateTime.UtcNow.ToString("o"));
+                Console.WriteLine("Elapsed: " + end.TotalMilliseconds);
+                Console.WriteLine("Speed m/sec: " + (end.TotalMilliseconds/500).ToString());
             }
         }
         

@@ -15,6 +15,6 @@
     <Reference Include="OwlOSC">
        <HintPath>..\OwlOSC.dll</HintPath>
     </Reference>
-</ItemGroup>
+  </ItemGroup>
 
 </Project>

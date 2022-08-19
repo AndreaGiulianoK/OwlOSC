@@ -18,7 +18,7 @@ namespace OwlOSC
             Dispose();
         }
 
-		private const int _MAX_QUEUE_SIZE = 1000;
+		private const int _MAX_QUEUE_SIZE = 10000;
 
         public int Port { get; private set; }
 
@@ -27,6 +27,8 @@ namespace OwlOSC
 
         HandleBytePacket BytePacketCallback = null;
         HandleOscPacket OscPacketCallback = null;
+
+        bool delayedAddressCallback;
 
 		ConcurrentQueue<OscPacket> packetQueue;
 
@@ -44,6 +46,8 @@ namespace OwlOSC
             Port = port;
 			packetQueue = new ConcurrentQueue<OscPacket>();
             addressCallbacks = new List<AddressHandler>();
+
+            System.Text.RegularExpressions.Regex.CacheSize = 32;
 
             // try to open the port 10 times, else fail
             for (int i = 0; i < 10; i++)
@@ -92,6 +96,20 @@ namespace OwlOSC
             this.BytePacketCallback = callback;
         }
 
+        /// <summary>
+		/// Start Listner with immediate Address match Callback.
+        /// If FALSE, a threaded loop will dequeue every millisecond
+		/// </summary>
+		/// <param name="port">>Listening port</param>
+		/// <param name="delayedAddressCallback">Delayed callback</param>
+		/// <returns>Listner instance</returns>
+        public UDPListener(int port, bool delayedAddressCallback = false) : this(port)
+        {
+            this.delayedAddressCallback = delayedAddressCallback;
+            if(delayedAddressCallback)
+                StartDequeueLoop();
+        }
+
         private async Task BeginListeningAsync(CancellationToken token)
         {
             while (true || !token.IsCancellationRequested)
@@ -121,10 +139,7 @@ namespace OwlOSC
             Console.WriteLine("End Listenting Async");
         }
 
-		/// <summary>
-		/// Start address callback evaluation loop
-		/// </summary>
-		public void StartAddressEvaluationLoop(){
+		private void StartDequeueLoop(){
 			Task.Run(() => DequeueLoop(token));
 		}
 
@@ -141,6 +156,7 @@ namespace OwlOSC
 					if(packet != null)
 						EvaluateAddresses(packet);
 				}
+                //VERY IMPORTANT TO AVOID UDP PACKET LOSS !!!!!!
 				await Task.Delay(1);
 			}
         }
@@ -153,8 +169,9 @@ namespace OwlOSC
 				try{
 					packet = OscPacket.GetPacket(bytes);
 				}
-				catch (Exception){
+				catch (Exception e){
 					// If there is an error reading the packet, null is sent to the callback
+                    Console.WriteLine("Error reading OSC bytes: " + e.Message);
 				}
 
 				if(packet != null){
@@ -172,6 +189,9 @@ namespace OwlOSC
                 {
                     OscPacketCallback(packet);
                 }
+                if(!delayedAddressCallback){
+                    EvaluateAddresses(packet);
+                }
             }
         }
 
@@ -180,7 +200,7 @@ namespace OwlOSC
 			if(!packet.IsBundle){
 				var address = ((OscMessage)packet).Address;
                 if(Utils.ValideteAddress(address)){
-				    addressCallbacks.Where(x => x.address == address).ToList().ForEach(x => x.callback.Invoke(packet));
+				    addressCallbacks.Where(x => Utils.MatchAddress(x.address,address)).ToList().ForEach(x => x.callback.Invoke(packet));
                 }else{
                     Console.WriteLine("Received message address malformed");
                 }
@@ -188,7 +208,7 @@ namespace OwlOSC
 				var bundle = (OscBundle)packet;
 				bundle.Messages.ForEach(m => {
                     if(Utils.ValideteAddress(m.Address)){
-                        addressCallbacks.Where(x => x.address == m.Address).ToList().ForEach(x => x.callback.Invoke(m));
+                        addressCallbacks.Where(x => Utils.MatchAddress(x.address,m.Address)).ToList().ForEach(x => x.callback.Invoke(m));
                     }else{
                         Console.WriteLine("Received message address malformed");
                     }

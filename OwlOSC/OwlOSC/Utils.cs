@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OwlOSC
 {
@@ -50,11 +51,63 @@ namespace OwlOSC
 
 		const string addressPattern = @"^\/$|^\/([a-zA-Z0-9\/\*\[\]-]*)([a-zA-Z0-9\*\]])$";
 
+		static Regex validateRegex;
+		static Regex wildcardRegex;
+
 		public static bool ValideteAddress(string address){
 			if(string.IsNullOrEmpty(address))
 				return false;
-			System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(addressPattern);
-			return regex.IsMatch(address);
+			if(validateRegex == null){
+				validateRegex = new Regex(addressPattern, RegexOptions.Compiled);
+			}
+			var match = validateRegex.IsMatch(address);
+			return match;
+		}
+
+		public static bool MatchAddress(string address, string prefix){
+			if(wildcardRegex == null){
+				wildcardRegex = new Regex("\\*", RegexOptions.Compiled);
+			}
+			bool wildAddress = wildcardRegex.IsMatch(address);
+			bool wildPrefix = wildcardRegex.IsMatch(prefix);
+			if(!wildAddress && !wildPrefix){
+				return (address == prefix);
+			}else{
+				bool matchAddress = false;
+				if(wildAddress){
+					string pattern = MakePattern(address);
+					matchAddress = Regex.IsMatch(prefix,pattern);
+					//Console.WriteLine($"{address} {prefix} -> {pattern} | {matchAddress}");
+				}
+				bool matchPrefix = false;
+				if(wildPrefix){
+					string pattern = MakePattern(prefix);
+					matchPrefix = Regex.IsMatch(address,pattern);
+					//Console.WriteLine($"{prefix} {address} -> {pattern} | {matchPrefix}");
+				}
+				return matchAddress || matchPrefix;
+			}
+		}
+
+		private static string MakePattern(string address){
+			string[] subs = address.Split('/');
+			string pattern = "";
+			for (int i=1; i<subs.Length; i++){
+				if(i==1 && subs[i] != "*"){
+					pattern = $"^";
+				}
+				if(subs[i] == "*" && i != subs.Length-1){
+						pattern += "([a-zA-Z-0-9]*)";
+				}else{
+					if(i==1)
+						pattern += $"(\\/{subs[i]}\\/)";
+					else
+						pattern += $"(\\/{subs[i]})";
+				}
+				if(i == subs.Length-1)
+					pattern += "([a-zA-Z0-9\\/]*)$";
+			}
+			return pattern;
 		}
 	}
 }

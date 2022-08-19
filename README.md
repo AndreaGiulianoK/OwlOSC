@@ -233,6 +233,7 @@ I would love to get some feedback. Use the Issue tracker on Github to send bug r
  - [x] Upgrade UDP to Async Operation
  - [x] Add more practical handling and discrimination of messages and bundles
  - [x] Add receiveng message address check and relative event handling
+ - [x] Support simple Wildcard in match address
  - [ ] Add message values Getter with nullcheck
  - [x] Release Dll
  - [x] Unity Test

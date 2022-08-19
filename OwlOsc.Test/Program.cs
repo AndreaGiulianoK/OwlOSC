@@ -112,7 +112,19 @@ namespace OwlOsc.Test
             }
             if(args[0] == "-receiveloop"){
                 
-                var listener = new UDPListener(localPort, GetMessage);
+                var listener = new UDPListener(localPort, (packet) => {
+                    if(packet == null){
+                        Console.WriteLine("Malformed OSC Packet");
+                        return;
+                    }
+                    if(packet.IsBundle){
+                        var bundleReceived = (OscBundle)packet;
+                        Console.WriteLine(bundleReceived.ToString());
+                    }else{
+                        var messageReceived = (OscMessage)packet;
+                        Console.WriteLine(messageReceived.ToString());
+                    }
+                });
 
                 Console.WriteLine("\nPress any key to stop and exit...");
                 Console.ReadKey();

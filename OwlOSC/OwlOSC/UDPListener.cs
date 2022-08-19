@@ -25,7 +25,6 @@ namespace OwlOSC
         UdpClient receivingUdpClient;
         IPEndPoint RemoteIpEndPoint;
 
-        HandleBytePacket BytePacketCallback = null;
         HandleOscPacket OscPacketCallback = null;
 
         bool delayedAddressCallback;
@@ -83,17 +82,6 @@ namespace OwlOSC
         public UDPListener(int port, HandleOscPacket callback) : this(port)
         {
             this.OscPacketCallback = callback;
-        }
-
-		/// <summary>
-		/// Start Listner with immediate Byte array Callback.
-		/// </summary>
-		/// <param name="port">>Listening port</param>
-		/// <param name="callback">Byte array received callback</param>
-		/// <returns>Listner instance</returns>
-        public UDPListener(int port, HandleBytePacket callback) : this(port)
-        {
-            this.BytePacketCallback = callback;
         }
 
         /// <summary>
@@ -154,7 +142,9 @@ namespace OwlOSC
 					OscPacket packet;
 					packetQueue.TryDequeue(out packet);
 					if(packet != null)
-						EvaluateAddresses(packet);
+                        try{
+                            EvaluateAddresses(packet);
+                        }catch{}
 				}
                 //VERY IMPORTANT TO AVOID UDP PACKET LOSS !!!!!!
 				await Task.Delay(1);
@@ -181,16 +171,17 @@ namespace OwlOSC
 					packetQueue.Enqueue(packet);
 				}
 				
-                if (BytePacketCallback != null)
+                if (OscPacketCallback != null)
                 {
-                    BytePacketCallback(bytes);
+                    try{
+                        OscPacketCallback(packet);
+                    }catch{}
                 }
-                else if (OscPacketCallback != null)
-                {
-                    OscPacketCallback(packet);
-                }
+                
                 if(!delayedAddressCallback){
-                    EvaluateAddresses(packet);
+                    try{
+                        EvaluateAddresses(packet);
+                    }catch{}
                 }
             }
         }

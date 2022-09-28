@@ -307,7 +307,7 @@ I would love to get some feedback. Use the Issue tracker on Github to send bug r
  - [x] Add receiveng message address check and relative event handling
  - [x] Support simple Wildcard in match address
  - [ ] ~~Add message values Getter with nullcheck~~ (useless)
- - [ ] Data type description in `ToString` method
+ - [x] Data type description in `ToString` method
  - [x] Release Dll
  - [x] Unity Test
  - [ ] Unity Interface

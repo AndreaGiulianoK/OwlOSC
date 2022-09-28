@@ -314,5 +314,5 @@ I would love to get some feedback. Use the Issue tracker on Github to send bug r
  - [ ] Unity Examples
 
 ## TO TEST:
- - [ ] Send/Receive/Print all supported data type (TimeTag,Symbol)
+ - [x] Send/Receive/Print all supported data type
  - [ ] Test all Platforms

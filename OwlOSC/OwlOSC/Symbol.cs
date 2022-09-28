@@ -21,7 +21,7 @@ namespace OwlOSC
 
 		public override string ToString()
 		{
-			return Value;
+			return $"Symbol({Value})";
 		}
 
 		public override bool Equals(System.Object obj)

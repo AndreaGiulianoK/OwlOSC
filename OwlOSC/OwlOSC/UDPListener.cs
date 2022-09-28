@@ -165,9 +165,10 @@ namespace OwlOSC
 				}
 
 				if(packet != null){
-					OscPacket tmp;
+                    Console.WriteLine($"Received {bytes.Length} byte of data");
+                    //if reached max queue size discard exceding message
 					while(packetQueue.Count >= _MAX_QUEUE_SIZE)
-						packetQueue.TryDequeue(out tmp);
+						packetQueue.TryDequeue(out OscPacket tmp);
 					packetQueue.Enqueue(packet);
 				}
 				

@@ -60,5 +60,9 @@ namespace OwlOSC
 		{
 			return (Port << 24) + (Status << 16) + (Data1 << 8) + (Data2);
 		}
+
+		public override string ToString(){
+			return $"Midi({Port} {Status} {Data1} {Data2})";
+		}
     }
 }

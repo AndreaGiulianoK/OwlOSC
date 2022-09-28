@@ -92,7 +92,14 @@ namespace OwlOsc.Test
 
             if(args[0] == "-send"){
                 using( var sender = new UDPSender("127.0.0.1", remotePort)){
-                    OscMessage message = new OscMessage("/test/1", 23, 42.01f, "hello world");
+                    //OscMessage message = new OscMessage("/test/1", 23, 42.01f, "hello world");
+                    OscMessage message = new OscMessage("/test", 40, 3.14f, "hello", 
+                    new byte[]{0x48,0x65,0x6C,0x6C,0x6F},
+                    999L, new Timetag(DateTime.Now), 3.14d, new Symbol("oscsymbol"),
+                    'c', new RGBA(100,200,150,128), new Midi(), true, false, null,
+                    Double.PositiveInfinity,
+                    new List<object>{1,1f,1d,1L,"array",true,null}, "end"
+                    );
                     sender.Send(message);
                     Console.WriteLine($"Mesage Sent: " + message.ToString());
                     var bundle = new OscBundle(new Timetag(DateTime.UtcNow).Tag, new OscMessage("/test",1.34f),new OscMessage("/test/subtest",2.3434d), new OscMessage("/c",3));

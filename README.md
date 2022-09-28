@@ -6,6 +6,19 @@ Developers: ***Andrea Giuliano***
 OSC operability based upon **[ValdemarOrn SharpOSC](https://github.com/ValdemarOrn/SharpOSC)**
 
 
+# Contents
+- [License](#license) 
+- [Download](#download)
+- [Features](#features)
+- [Supported Types](#supported-types)
+- [Supported Address Pattern](#supported-address-pattern)
+- [Performance and Testing](#performance-and-testing)
+- [Changelog](#changelog)
+- [Build](#build)
+- [Use Examples](#use-examples)
+- [Contribute](#contribute)
+- [TO DO](#to-do)
+
 ## License
 
 OwlOSC is licensed under the MIT license.
@@ -22,6 +35,7 @@ Compiled library and unity package here: **[Releases](https://github.com/AndreaG
 
 + Multiplatform menaged dll (NetStandard 2.1)
 + Send / Receive OSC messages and bundle via UDP in Async Multithread
++ Partial support for Address Pattern (only *)
 + Register address callback
 + OSC values converted from and to Net objects
 + Unity3D interface and utilities
@@ -52,6 +66,23 @@ Compiled library and unity package here: **[Releases](https://github.com/AndreaG
 
 (Note that nested arrays (arrays within arrays) are not supported, the OSC specification is unclear about whether that it is even allowed)
 
+## Supported Address Pattern
+
+Only * charater is supported. Path is supported in Send and in Receive.
+Address validation Regex:
+
+```
+^\/$|^\/([a-zA-Z0-9\/\*\[\]-]*)([a-zA-Z0-9\*\]])$
+```
+
+Path Example:
+
+- '/' -> only root ('/')
+- /test' -> only '/test'
+- '*' -> any path
+- '/test/* -> any in test
+- 'test/*/sub' -> any in test that have sub as subpath ( '/test/a/sub','/test/2/sub', etc)
+
 ## Performance and Testing
 
 ### Speed:
@@ -76,6 +107,43 @@ Speed: ~ 0.025ms (linux) / ~0.05ms (win)
 
 Changelog here **[Changelog.md](https://github.com/AndreaGiulianoK/OwlOSC/blob/master/CHANGELOG.md)**
 
+## Build
+
+### Library
+
+Tip for compiling the Library with VScode and dotnet.
+```
+cd OwlOSC
+dotnet build -c Release -f {framework}
+```
+Where `{framework}` is the target framework:
+- netcoreapp3.1
+- netstandard2.1
+
+### Test Application
+
+Tip for compiling the test console program with VScode and dotnet.
+```
+cd OwlOsc.Test
+dotnet publish -c Release -r {platform} -p:PublishSingleFile=true --self-contained false
+```
+Or for single container executable with all system dll
+```
+cd OwlOsc.Test
+dotnet publish -c Release -r {platform} -p:PublishSingleFile=true --self-contained true
+```
+Where `{platform}` is the target platform os and CPU architecture RID:
+- win-x64
+- win-x86
+- win-arm
+- win-arm64
+- linux-x64
+- linux-musl-x64
+- linux-arm
+- linux-arm64
+- osx-x64
+- ios-arm64
+- android-arm64
 
 ## Using The Library
 
@@ -90,9 +158,11 @@ Look at the example scene in the folder "OwlOSC/Examples"
 Add a reference to OwlOSC.dll in your .NET project. 
 OwlOSC is under that namespace "OwlOSC".
 
-## Examples:
+## Use Examples:
 
-### .NET: Sending a message Synchronously
+### .NET
+
+#### .NET: Sending a message Synchronously
 
 	class Program
 	{
@@ -109,7 +179,7 @@ OwlOSC is under that namespace "OwlOSC".
 
 This example sends an OSC message to the local machine on port 55555 containing 3 arguments: an integer with a value of 23, a floating point number with the value 42.01 and the string "hello world". If another program is listening to port 55555 it will receive the message and be able to use the data sent.
 
-### .NET: Receiving a Message Asynchronous Manually
+#### .NET: Receiving a Message Asynchronous Manually
 
 	class Program
 	{
@@ -131,7 +201,7 @@ This example sends an OSC message to the local machine on port 55555 containing 
 This shows a very simple way of waiting for incoming messages. The listener.Receive() method will check if the listener has received any new messages since it was last called. It will poll for a message every millisecond. If there is a new message that has not been returned it will assign messageReceived to point to that message. If no message has been received since the last call to Receive it will return null.
 When messageReceived is pointig to a message the cycle ends, the listner is closed and the content of the message is returned to the console.
 
-### .NET:  Receiving a Message Asynchronous by direct callback
+#### .NET:  Receiving a Message Asynchronous by direct callback
 
 	class Program
 	{
@@ -150,7 +220,7 @@ When messageReceived is pointig to a message the cycle ends, the listner is clos
 
 By giving UDPListener a callback you don't have to periodically check for incoming messages. The listener will simply invoke the callback whenever a message is received. No address check is performed.
 
-### .NET:  Receiving a Message Asynchronous by Address callback handling
+#### .NET:  Receiving a Message Asynchronous by Address callback handling
 
 	class Program
 	{
@@ -174,7 +244,9 @@ By giving UDPListener a callback you don't have to periodically check for incomi
 
 By registering a callback to UDPListener the listener will invoke the callback whenever a message with the matching address is received.
 
-### UNITY:  Example Send/Receive script
+### UNITY
+
+#### UNITY:  Example Send/Receive script
 
 	using System.Collections;
 	using UnityEngine;
@@ -234,8 +306,13 @@ I would love to get some feedback. Use the Issue tracker on Github to send bug r
  - [x] Add more practical handling and discrimination of messages and bundles
  - [x] Add receiveng message address check and relative event handling
  - [x] Support simple Wildcard in match address
- - [ ] Add message values Getter with nullcheck
+ - [ ] ~~Add message values Getter with nullcheck~~ (useless)
+ - [ ] Data type description in `ToString` method
  - [x] Release Dll
  - [x] Unity Test
  - [ ] Unity Interface
  - [ ] Unity Examples
+
+## TO TEST:
+ - [ ] Send/Receive/Print all supported data type (TimeTag,Symbol)
+ - [ ] Test all Platforms

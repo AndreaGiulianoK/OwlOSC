@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6] 2022.09.28
+- Added `ToString` override to all OSC custom type
+- Message `ToString` now return also data type
+- Added content and build sections to readme.md
+
 ## [1.5] 2022.08.19
 - Address wildcard
 - Immediate Addres callback

@@ -88,5 +88,9 @@ namespace OwlOSC
 		{
 			return (int)( ((uint)(Tag >> 32) + (uint)(Tag & 0x00000000FFFFFFFF)) / 2);
 		}
+
+		public override string ToString(){
+			return Timestamp.ToString("o");
+		}
 	}
 }

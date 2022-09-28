@@ -60,5 +60,9 @@ namespace OwlOSC
 		{
 			return (R << 24) + (G << 16) + (B << 8) + (A);
 		}
+
+		public override string ToString(){
+			return $"Rgba({R},{G},{B},{A})";
+		}
 	}
 }

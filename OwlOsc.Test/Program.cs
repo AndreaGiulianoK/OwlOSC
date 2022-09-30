@@ -51,8 +51,8 @@ namespace OwlOsc.Test
             //
             if(args[0] == "-test"){
                 Console.WriteLine("TEST");
-                //create new listner instance
-                var listener = new UDPListener(localPort);
+                //create new Listener instance
+                var listener = new UDPListener(localPort,false);
                 //register for specific address
                 
                 listener.AddAddress("/test/*", (packet) => {
@@ -111,27 +111,16 @@ namespace OwlOsc.Test
                 using(var listener = new UDPListener(localPort)){
                     OscPacket message=null;
                     while(message == null){
-                        message = listener.Receive();
+                        message = listener.ReadQueuedMessage();
                         System.Threading.Thread.Sleep(1);
                     }
-                    GetMessage(message);
+                    PrintMessage(message);
                 }   
             }
             if(args[0] == "-receiveloop"){
                 
-                var listener = new UDPListener(localPort, (packet) => {
-                    if(packet == null){
-                        Console.WriteLine("Malformed OSC Packet");
-                        return;
-                    }
-                    if(packet.IsBundle){
-                        var bundleReceived = (OscBundle)packet;
-                        Console.WriteLine(bundleReceived.ToString());
-                    }else{
-                        var messageReceived = (OscMessage)packet;
-                        Console.WriteLine(messageReceived.ToString());
-                    }
-                });
+                var listener = new UDPListener(localPort,false);
+                listener.AddAddress("/*", (packet) => PrintMessage(packet));
 
                 Console.WriteLine("\nPress any key to stop and exit...");
                 Console.ReadKey();
@@ -151,7 +140,9 @@ namespace OwlOsc.Test
                 }
             }
             if(args[0] == "-receiveTicks"){
-                var listener = new UDPListener(localPort, ReceiveTicks);
+                var listener = new UDPListener(localPort,false);
+                listener.AddAddress("/*", ReceiveTicks);
+
                 Console.WriteLine("\nPress any key to stop and exit...");
                 Console.ReadKey();
                 listener.Dispose();
@@ -182,9 +173,9 @@ namespace OwlOsc.Test
                 if(args.Length != 2)
                     throw new Exception("Invalid parameters");
                 OscPacket message=null;
-                using( var listner = new UDPListener(localPort) ){
+                using( var Listener = new UDPListener(localPort) ){
                     while(message == null){
-                        message = listner.Receive();
+                        message = Listener.ReadQueuedMessage();
                         Task.Delay(1);
                     }
                 }
@@ -216,7 +207,7 @@ namespace OwlOsc.Test
             }
         }
         
-        static void GetMessage (OscPacket packet){
+        static void PrintMessage (OscPacket packet){
             if(packet == null){
                 Console.WriteLine("Malformed OSC Packet");
                 return;

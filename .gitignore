@@ -10,3 +10,17 @@ OwlOSC/bin/
 OwlOSC/obj/
 
 Varius/
+
+OwlOscUnity/Temp/
+
+OwlOscUnity/obj/
+
+OwlOscUnity/Logs/
+
+OwlOscUnity/Library/
+
+OwlOscUnity/Assembly-CSharp.csproj
+
+OwlOscUnity/OwlOscUnity.sln
+
+OwlOscUnity/Builds/

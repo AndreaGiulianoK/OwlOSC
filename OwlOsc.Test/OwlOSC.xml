@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OwlOSC</name>
+    </assembly>
+    <members>
+        <member name="M:OwlOSC.OscMessage.GetBytes">
+            <summary>
+            Get raw byte data of message for Send purpouse
+            </summary>
+            <returns>Raw Byte Array</returns>
+        </member>
+        <member name="M:OwlOSC.OscPacket.parseMessage(System.Byte[])">
+            <summary>
+            Takes in an OSC bundle package in byte form and parses it into a more usable OscBundle object
+            </summary>
+            <param name="msg"></param>
+            <returns>Message containing various arguments and an address</returns>
+        </member>
+        <member name="M:OwlOSC.OscPacket.parseBundle(System.Byte[])">
+            <summary>
+            Takes in an OSC bundle package in byte form and parses it into a more usable OscBundle object
+            </summary>
+            <param name="bundle"></param>
+            <returns>Bundle containing elements and a timetag</returns>
+        </member>
+        <member name="P:OwlOSC.Timetag.Fraction">
+            <summary>
+            Gets or sets the fraction of a second in the timestamp. the double precision number is multiplied by 2^32
+            giving an accuracy down to about 230 picoseconds ( 1/(2^32) of a second)
+            </summary>
+        </member>
+        <member name="M:OwlOSC.UDPListener.#ctor(System.Int32)">
+            <summary>
+            Create a new OSC Listener and start threaded receive loop.
+            </summary>
+            <param name="port">Listening port</param>
+        </member>
+        <member name="M:OwlOSC.UDPListener.#ctor(System.Int32,System.Boolean)">
+            <summary>
+            Create listener and start a threaded read loop.
+            If 'queueMessages' is TRUE, messages are queued, if FALSE or none, the callbacks will be immediate e no message will be quequed.
+            If 'queueMessages' is TRUE the messages must be dequeued manually with the 'ReadQueuedMessage' or 'ReadAllQueuedMessages' methods.
+            NOTE: Unity3D require 'queueMessages' is TRUE.
+            </summary>
+            <param name="port">>Listening port</param>
+            <param name="queueMessages">Enqueue the received messages and don't evaluate addresses callbacks</param>
+            <returns>Listener instance</returns>
+        </member>
+        <member name="M:OwlOSC.UDPListener.EvaluateAddresses(OwlOSC.OscPacket)">
+            <summary>
+            Evalauate address pattern and Invoke callback (Thread safe)
+            </summary>
+            <param name="packet"></param>
+        </member>
+        <member name="M:OwlOSC.UDPListener.AddAddress(System.String,OwlOSC.HandleOscPacket)">
+            <summary>
+            Add an handler for specific address.
+            </summary>
+            <param name="address">addres of message</param>
+            <param name="handleOscPacket">Packet handler</param>
+            <returns>True if address is valid and added, FALSE if not</returns>
+        </member>
+        <member name="M:OwlOSC.UDPListener.ReadQueuedMessage(System.Boolean)">
+            <summary>
+            Get single message from queue. (Thread Safe).
+            If 'evaluateAddressCallback' is TRUE matches address patterns and invoke callbacks.
+            NOTE: if 'queueMessages' of this UDPListener is FALSE no message will be queued and returned from this method.
+            WARNING! The mesasge is removed from evaluation loop so if 'evaluateAddressCallback' is FALSE no callback will occour for returned message.
+            WARNING! Can be NULL, require a nullcheck.
+            </summary>
+            <param name="evaluateAddressCallback">Evaluate and Call address callback</param>
+            <returns>message/bundle packet, can be NULL</returns>      
+        </member>
+        <member name="M:OwlOSC.UDPListener.ReadAllQueuedMessages(System.Boolean)">
+            <summary>
+            Read all messages in queue. (Thread Safe).
+            If 'evaluateAddressCallback' is TRUE matches address patterns and invoke callbacks.
+            NOTE: if 'queueMessages' of this UDPListener is FALSE no message will be queued.
+            </summary>
+            <param name="evaluateAddressCallback">Evaluate and Call address callback</param>
+        </member>
+        <member name="M:OwlOSC.Utils.MatchAddress(System.String,System.String)">
+            <summary>
+            Compare message prefix pattern and delegate address path pattern.
+            Always true if address path is wildcard '*'.
+            </summary>
+            <param name="address">Delegate address path</param>
+            <param name="prefix">Message prefix</param>
+            <returns>True if one or both of the prefix pattern and address pattern match</returns>
+        </member>
+    </members>
+</doc>

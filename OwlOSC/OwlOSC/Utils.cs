@@ -64,7 +64,18 @@ namespace OwlOSC
 			return match;
 		}
 
+		/// <summary>
+		/// Compare message prefix pattern and delegate address path pattern.
+		/// Always true if address path is wildcard '*'.
+		/// </summary>
+		/// <param name="address">Delegate address path</param>
+		/// <param name="prefix">Message prefix</param>
+		/// <returns>True if one or both of the prefix pattern and address pattern match</returns>
 		public static bool MatchAddress(string address, string prefix){
+			//Fast for any address wildcard pattern
+			if(address == "/*")
+				return true;
+			//Regex for normal evaluation
 			if(wildcardRegex == null){
 				wildcardRegex = new Regex("\\*", RegexOptions.Compiled);
 			}

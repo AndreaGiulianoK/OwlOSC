@@ -59,7 +59,7 @@ namespace OwlOSC
 			if(message.Length > _MAX_PACKET_SIZE)
 				throw new Exception("Message exceeds UDP max packet size (64k)");
 			int sent = sock.SendTo(message, RemoteIpEndPoint);
-			Console.WriteLine($"Sent {sent} byte of data)");
+			Console.WriteLine($"Sent {sent} byte of data");
 		}
 
 		public void Send(OscPacket packet)

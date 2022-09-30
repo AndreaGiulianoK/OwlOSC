@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7] 2022.09.30
+- Added Unity Project and Package
+- Changes to the handling of the listener's message queue
+
 ## [1.6] 2022.09.28
 - Added `ToString` override to all OSC custom type
 - Message `ToString` now return also data type

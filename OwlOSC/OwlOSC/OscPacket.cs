@@ -80,7 +80,7 @@ namespace OwlOSC
 					case('s'):
 						string stringVal = getString(msg, index);
 						arguments.Add(stringVal);
-						index += stringVal.Length;
+						index += stringVal.Length + 1; // added 1 to account for the null
 						break;
 				
 					case('b'):
@@ -240,7 +240,7 @@ namespace OwlOSC
 			int i = index + 4;
 			char[] types = null;
 
-			for (; i < msg.Length; i += 4)
+			for (; i <= msg.Length; i += 4)
 			{
 				if (msg[i - 1] == 0)
 				{

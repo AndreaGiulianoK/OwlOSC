@@ -1,9 +1,13 @@
 # OwlOSC
 
-Small library that implement ***Open Sound Control (OSC)*** communication protocol for ***UNITY3D*** and any NetStandard (Net Framework / NetCore) project.
+Small ***C# menaged library*** that implement ***Open Sound Control (OSC 1.0)*** communication protocol with ***multithreaded queued message receiver with thread safe callback and address pattern match***  for ***UNITY3D*** and any ***NetStandard*** (Net Framework / NetCore) project.
+
+*As a managed library it runs on any DOT NET supported platform.*
+*As a Unity 3D plugin it runs only in x86_64 Standalone (Windows,Linux,Mac) and on mobile platforms (Android, iOS); **no support for WebGL** (due to the security restrictions of the webgl specifications).*
 
 Developers: ***Andrea Giuliano***
-OSC operability based upon **[ValdemarOrn SharpOSC](https://github.com/ValdemarOrn/SharpOSC)**
+
+(OSC operability based upon **[ValdemarOrn SharpOSC](https://github.com/ValdemarOrn/SharpOSC)**)
 
 
 # Contents
@@ -33,18 +37,20 @@ Compiled library and unity package here: **[Releases](https://github.com/AndreaG
 
 ## Features
 
-+ Multiplatform menaged dll (NetStandard 2.1)
-+ Send / Receive OSC messages and bundle via UDP in Async Multithread
-+ Partial support for Address Pattern (only *)
-+ Register address callback
++ Menaged dll (NetStandard 2.1)
++ Send / Receive OSC messages and bundle via UDP
++ Receive OSC message in background Thread
++ Thread Safe received message queue
++ Pattern address callback with crossed comparation between message and registered path
++ Partial support for pattern wildcards (only '*')
 + OSC values converted from and to Net objects
-+ Unity3D interface and utilities
-+ **Unity3D multithread safe read option (needed to create unity gameobject in main render thread)**
++ Unity3D Examples
++ **Unity3D Main Thread safe async callbacks option** (needed to instantiate objects in main render thread)
 
 
 ## Supported Types
 
-[The following OSC types](http://opensoundcontrol.org/spec-1_0) are supported:
+[The following OSC types (OSC Spec 1.0)](https://opensoundcontrol.stanford.edu/spec-1_0.html) are supported:
 
 * i	- int32 (System.Int32)
 * f	- float32 (System.Single)
@@ -68,20 +74,33 @@ Compiled library and unity package here: **[Releases](https://github.com/AndreaG
 
 ## Supported Address Pattern
 
-Only * charater is supported. Path is supported in Send and in Receive.
-Address validation Regex:
+Only * charater is supported. Path comparation is performed between received message prefix and  callback address path.
+Every message prefix and every callback pattern must pass address validation regex:
 
 ```
 ^\/$|^\/([a-zA-Z0-9\/\*\[\]-]*)([a-zA-Z0-9\*\]])$
 ```
 
-Path Example:
+**Supported wildcard:**
 
-- '/' -> only root ('/')
-- /test' -> only '/test'
-- '*' -> any path
-- '/test/* -> any in test
-- 'test/*/sub' -> any in test that have sub as subpath ( '/test/a/sub','/test/2/sub', etc)
+- __*__
+
+**NO support for other wildcards:**
+
+- ? (single character)
+- [ - ] (range)
+
+Callback Path Example:
+
+- '*' -> matches any message prefix (fast direct evaluation without regex)
+- '/' -> matches only root '/'
+- '/*' -> matches any message prefix
+- '/test' -> matches only '/test'
+- '/test/* -> matches any prefix in test ('/test/1','/test/a/sub', etc)
+- '/test/*ub' -> matches any prefix in test that has any subpath ending with 'ub' ('/test/sub','/test/pub',etc)
+- '/test/*/sub' -> matches any prefix in test that has 'sub' as second subpath ('/test/a/sub','/test/1/sub', etc)
+
+[OSC spec 1.0 Address path reference](https://ccrma.stanford.edu/groups/osc/spec-1_0-examples.html#OSCaddress)
 
 ## Performance and Testing
 
@@ -91,16 +110,32 @@ Single message speed on send-receive on localhost
 
 Speed: ~ 0.025ms (linux) / ~0.05ms (win)
 
-*Note: for reliability insert a delay of 1ms between two consecutive message otherwise udp packet can be dropped.*
+*Note: for reliability insert a delay of 1ms between two consecutive message reads otherwise udp packet can be dropped with mass receiving.*
 
 ### Successful Testing:
 
-- [x] Linux Ubuntu 20.04 (x64)
-- [ ] Raspberry OS (ARM)
-- [x] Windows 10 (x64)
-- [ ] macOS / OS X (x64)
-- [ ] Android
-- [ ] iOS
+### Linux
+- [x] Console - Linux Ubuntu 20.04 (x64)
+- [x] Unity3D (Mono) - Linux Ubuntu 20.04 (x64)
+- [x] Unity3D (IL2CPP) - Linux Ubuntu 20.04 (x64)
+
+### Windows
+- [x] Console - Windows 10 (x64)
+- [x] Unity3D (Mono) - Windows 10 (x64)
+- [ ] Unity3D (IL2CPP) - Windows 10 (x64)
+
+### OS X
+- [ ] Unity (Mono) - OS X (x64)
+
+### Raspberry OS
+- [ ] Console - Raspberry OS (ARM)
+
+### Android
+- [ ] Unity3D (Mono)
+- [ ] Unity3D (IL2CPP)
+
+### iOS
+- [ ] Unity3D (IL2CPP)
 
 
 ## Changelog
@@ -111,7 +146,14 @@ Changelog here **[Changelog.md](https://github.com/AndreaGiulianoK/OwlOSC/blob/m
 
 ### Library
 
-Tip for compiling the Library with VScode and dotnet.
+Tips for compiling the Library with VScode and dotnet.
+
+Simple: compile in Debug for netstandard2.1, netcoreapp3.1, net4.7.1
+```
+cd OwlOSC
+dotnet build
+```
+Complex: specify release configuration and target framework
 ```
 cd OwlOSC
 dotnet build -c Release -f {framework}
@@ -122,7 +164,7 @@ Where `{framework}` is the target framework:
 
 ### Test Application
 
-Tip for compiling the test console program with VScode and dotnet.
+Tips for compiling the test console program with VScode and dotnet.
 ```
 cd OwlOsc.Test
 dotnet publish -c Release -r {platform} -p:PublishSingleFile=true --self-contained false
@@ -149,14 +191,14 @@ Where `{platform}` is the target platform os and CPU architecture RID:
 
 ### Unity3D:
 
-Import the package.
-OwlOSC is under that namespace "OwlOSC".
-Look at the example scene in the folder "OwlOSC/Examples"
+Import the package located in *[Release Section](https://github.com/AndreaGiulianoK/OwlOSC/releases)**.
+OwlOSC is under the namespace "OwlOSC".
+Look at the example scene "OwlOSC/OwlOscTest.unity"
 
 ### .NET:
 
-Add a reference to OwlOSC.dll in your .NET project. 
-OwlOSC is under that namespace "OwlOSC".
+Add a reference to OwlOSC.dll in your .NET project.
+OwlOSC is under the namespace "OwlOSC".
 
 ## Use Examples:
 
@@ -179,18 +221,47 @@ OwlOSC is under that namespace "OwlOSC".
 
 This example sends an OSC message to the local machine on port 55555 containing 3 arguments: an integer with a value of 23, a floating point number with the value 42.01 and the string "hello world". If another program is listening to port 55555 it will receive the message and be able to use the data sent.
 
-#### .NET: Receiving a Message Asynchronous Manually
+#### .NET:  Receiving a Message Synchronously with Address callback handling
+
+	class Program
+	{
+		public void Main(string[] args)
+		{
+			//create a listener with immediate sync callback
+			var listener = new OwlOSC.UDPListener(localPort,false);
+			//register a callback for specific address, only messages with the corresponding address will invoke the callback
+			bool address = listener.AddAddress("/test", (packet) => {
+				Console.WriteLine("Message: " + packet.ToString());
+			});
+
+			//keeps the program open until a key is pressed
+			Console.WriteLine("\nPress any key to stop and exit...");
+			Console.ReadKey();
+			listener.Dispose();
+		}
+	}
+
+By registering a callback to UDPListener the listener will invoke the callback whenever a message with the matching address is received. By creating an UDPListener with `queueMessages = false` the listener will evaluate the address path and invoke the callback immediatly. By creating an UDPListener with `queueMessages = true` the listener will enqueue the message and must be manually readed from the queue.
+
+
+#### .NET: Receiving a Message Manually
 
 	class Program
 	{
 		static void Main(string[] args)
 		{
+			//create a listener with message queue and no addreses callbacks evaluation loop
 			using(var listener = new OwlOSC.UDPListener(55555))
 			{
+				//register a callback for specific address, only messages with the corresponding address will invoke the callback
+				bool address = listener.AddAddress("/test", (packet) => {
+					Console.WriteLine("Message: " + packet.ToString());
+				});
 				OwlOSC.OscPacket messageReceived=null;
 				while(messageReceived == null)
 				{
-					messageReceived = listener.Receive();
+					//get a message from the queue and NOT evaluate address path and callbacks
+					messageReceived = listener.ReadQueuedMessage(false);
 					System.Threading.Thread.Sleep(1);
 				}
 				Console.WriteLine(messageReceived.ToString());
@@ -198,102 +269,73 @@ This example sends an OSC message to the local machine on port 55555 containing 
 		}
 	}
 
-This shows a very simple way of waiting for incoming messages. The listener.Receive() method will check if the listener has received any new messages since it was last called. It will poll for a message every millisecond. If there is a new message that has not been returned it will assign messageReceived to point to that message. If no message has been received since the last call to Receive it will return null.
-When messageReceived is pointig to a message the cycle ends, the listner is closed and the content of the message is returned to the console.
+This shows a way of waiting for a single incoming messages.
 
-#### .NET:  Receiving a Message Asynchronous by direct callback
+The listener was created by disabling the synchronous match by assigning `queueMessages = true` and thus allowing the routing of messages to the concurrent Queue. In this context it is obligatory to manually read the messages from the queue with the method `ReadQueuedMessage` or `ReadAllQueuedMessages` and choose whether to invoke the evaluation of the address and consequent callback or simply obtain the message by setting `evaluateAddressCallback = false`.
 
-	class Program
-	{
-		public void Main(string[] args)
-		{
-			var listener = new OwlOSC.UDPListener(localPort, (packet) => {
-				Console.WriteLine(packet.ToString());
-			});
-
-			//keeps the program open until a key is pressed
-			Console.WriteLine("\nPress any key to stop and exit...");
-			Console.ReadKey();
-			listener.Dispose();
-		}
-	}
-
-By giving UDPListener a callback you don't have to periodically check for incoming messages. The listener will simply invoke the callback whenever a message is received. No address check is performed.
-
-#### .NET:  Receiving a Message Asynchronous by Address callback handling
-
-	class Program
-	{
-		public void Main(string[] args)
-		{
-			var listener = new OwlOSC.UDPListener(localPort);
-			//register a callback for specific address, only messages with the corresponding address will invoke the callback
-			bool address = listener.AddAddress("/test", (packet) => {
-				Console.WriteLine("Address: " + packet.ToString());
-			});
-			
-			//Start address evaluation loop
-			listener.StartAddressEvaluationLoop();
-
-			//keeps the program open until a key is pressed
-			Console.WriteLine("\nPress any key to stop and exit...");
-			Console.ReadKey();
-			listener.Dispose();
-		}
-	}
-
-By registering a callback to UDPListener the listener will invoke the callback whenever a message with the matching address is received.
+In this example when `messageReceived` is pointig to a valid message the cycle ends, the Listener is closed and the content of the message is returned to the console but the callback relative for the registered address will never be invoked.
 
 ### UNITY
 
-#### UNITY:  Example Send/Receive script
+#### UNITY:  Example Send script
 
 	using System.Collections;
+	using System.Collections.Generic;
 	using UnityEngine;
 	using OwlOSC;
 
-	public class OwlOscTest : MonoBehaviour
+	public class SimpleSender : MonoBehaviour
 	{
-		UDPSender sender;
-		UDPListener listener;
+		public string remoteHost = "127.0.0.1";
+		public int remotePort = 55555;
+		public string prefix = "/test";
 
 		private void OnEnable() {
-
-			//Instantiate Sender and send a message
-			sender = new UDPSender("127.0.0.1",55555);
-			sender.Send(new OscMessage("/test", 42, "hello"));
-
-			//Instantiate Listener and register address
-			listener = new UDPListener(55555);
-			listener.AddAddress("/test",(packet) => {
-				Debug.Log(packet.ToString());
-			});
-
-			//If You want to create UNITY OBJECT in main thread you can read from a message pool from a coroutine
-			StartCoroutine(ReadLoop());
+			Send();
 		}
 
-		//Free Resources
-		private void OnDisable() {
-			StopAllCoroutines();
-			sender.Dispose();
-			listener.Dispose();
-		}
-
-		IEnumerator ReadLoop(){
-			while(true){
-				// Receive method dequeue the massage
-				// Require null check!
-				var packet = listener.Receive();
-				if(packet != null)
-					Debug.Log(packet.ToString());
-				yield return new WaitForEndOfFrame();
+		[ContextMenu("Send Message")]
+		public void Send(){
+			using(var sender = new UDPSender(remoteHost,remotePort)){
+				sender.Send(new OscMessage(prefix, Random.Range(0,float.MaxValue), "hello"));
 			}
 		}
 	}
 
-In unity it is possible to create new Unity GameObjects only from the main thread. Since UDPListner is multithreaded if you receive the callback directly it is not possible to instantiate new objects.
-it is therefore necessary to read manually from a coroutine (which acts on the main thread). In this way it is possible to receive all messages and perform "heavy" actions in the Unity Render thread without affecting the speed of reading messages.
+#### UNITY:  Example Receive script
+
+	using System.Collections;
+	using System.Collections.Generic;
+	using UnityEngine;
+	using OwlOSC;
+
+	public class SimpleListener : MonoBehaviour
+	{
+		public int localPort = 55555;
+		UDPListener listener;
+		
+		private void OnEnable() {
+			//Instantiate simple listener
+			listener = new UDPListener(localPort);
+			//register address path callback
+			listener.AddAddress("/*",(packet) => {
+				Debug.Log(packet.ToString());
+			});
+		}
+
+		private void Update() {
+			//read every frame all messages in queue
+			listener.ReadAllQueuedMessages();
+		}
+
+		private void OnDisable() {
+			listener.Dispose();
+		}
+	}
+
+
+In unity it is possible to create new Unity GameObjects only from the main thread. Since UDPListener is multithreaded if you receive the callback directly it is not possible to instantiate new objects.
+it is therefore necessary to read manually from a coroutine or the `Update` function (which acts on the main thread). In this way it is possible to receive all messages and perform "heavy" actions in the Unity Render thread without affecting the speed of reading messages.
 
 
 ## Contribute

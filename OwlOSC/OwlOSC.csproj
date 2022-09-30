@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netcoreapp3.1;net4.7.1</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>OwlOSC</AssemblyName>
-    <Version>1.5</Version>
+    <Version>1.7</Version>
     <Company>OwlInteractive</Company>
     <Authors>AndreaGiuliano</Authors>
     <Product>OwlOSC</Product>
